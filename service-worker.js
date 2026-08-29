@@ -1,4 +1,4 @@
-const CACHE_NAME = 'study-cards-pwa-v1';
+const CACHE_NAME = 'study-cards-pwa-v2';
 const APP_SHELL = ['./', './index.html', './config.js', './manifest.json'];
 
 self.addEventListener('install', event => {
