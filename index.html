@@ -32,6 +32,7 @@
         <div id="subjectFilters" class="chips"></div>
         <div class="section-label">大分野</div>
         <div id="majorFilters" class="chips"></div>
+        <div id="majorHint" class="small">科目を選択すると、その科目の大分野が表示されます。</div>
         <button class="btn primary" onclick="startStudy()">学習開始</button>
         <div id="message" class="status"></div>
       </div>
@@ -76,6 +77,7 @@ const API_URL=(window.STUDY_CARDS_CONFIG||{}).apiUrl||'';
 const TOKEN_KEY='studyCardsApiTokenV1';
 const OFFLINE_KEY='studyCardsOfflineCardsV1';
 const PENDING_KEY='studyCardsPendingV1';
+const SUBJECT_ORDER=['民法','民訴法','会社法','憲法','行政法','刑法','刑訴法','経済法','民事実務基礎','刑事実務基礎'];
 let sessionCards=[];
 let activeCards=[];
 let queue=[];
@@ -87,6 +89,13 @@ function token(){return localStorage.getItem(TOKEN_KEY)||''}
 function setApiToken(){
   const v=prompt('接続キーを入力してください。',token());
   if(v!==null){localStorage.setItem(TOKEN_KEY,v.trim());setMessage('接続キーを保存しました。')}
+}
+function sortSubjects(items){
+  return [...items].sort((a,b)=>{
+    const ai=SUBJECT_ORDER.indexOf(a),bi=SUBJECT_ORDER.indexOf(b);
+    if(ai===-1&&bi===-1)return a.localeCompare(b,'ja');
+    if(ai===-1)return 1;if(bi===-1)return -1;return ai-bi;
+  });
 }
 
 function apiRequest(action,payload={}){
@@ -120,12 +129,23 @@ function updateOfflineStatus(){const d=getOffline();const el=document.getElement
 
 function availableCards(){if(sessionCards.length)return sessionCards;const d=getOffline();return Array.isArray(d.cards)?d.cards:[]}
 function renderFilters(cards){
-  const subs=[...new Set(cards.map(c=>c.subject).filter(Boolean))].sort();
-  const majors=[...new Set(cards.map(c=>c.majorCategory).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
-  const s=document.getElementById('subjectFilters');const m=document.getElementById('majorFilters');s.innerHTML='';m.innerHTML='';
-  subs.forEach(v=>s.appendChild(chip('subject',v)));majors.forEach(v=>m.appendChild(chip('major',v)));
+  const subs=sortSubjects([...new Set(cards.map(c=>c.subject).filter(Boolean))]);
+  const s=document.getElementById('subjectFilters');s.innerHTML='';
+  subs.forEach(v=>s.appendChild(chip('subject',v,renderMajorFilters)));
+  renderMajorFilters();
 }
-function chip(cls,v){const l=document.createElement('label');l.className='chip';const i=document.createElement('input');i.type='checkbox';i.className=cls;i.value=v;const t=document.createElement('span');t.textContent=v;l.append(i,t);return l}
+function renderMajorFilters(){
+  const cards=availableCards();
+  const selected=checked('subject');
+  const m=document.getElementById('majorFilters');
+  const hint=document.getElementById('majorHint');
+  m.innerHTML='';
+  if(!selected.length){hint.style.display='block';return}
+  hint.style.display='none';
+  const majors=[...new Set(cards.filter(c=>selected.includes(c.subject)).map(c=>c.majorCategory).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
+  majors.forEach(v=>m.appendChild(chip('major',v)));
+}
+function chip(cls,v,onChange){const l=document.createElement('label');l.className='chip';const i=document.createElement('input');i.type='checkbox';i.className=cls;i.value=v;if(onChange)i.addEventListener('change',onChange);const t=document.createElement('span');t.textContent=v;l.append(i,t);return l}
 function checked(cls){return [...document.querySelectorAll('.'+cls+':checked')].map(x=>x.value)}
 
 function startStudy(){
@@ -173,7 +193,7 @@ function setMessage(t,danger=false){const e=document.getElementById('message');e
 function updateOnlineStatus(){document.getElementById('onlineStatus').textContent=navigator.onLine?'現在オンラインです。通常はスプレッドシートから最新版を読みます。':'現在オフラインです。保存済みカードのみ利用できます。'}
 
 window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
-document.addEventListener('DOMContentLoaded',()=>{updateOnlineStatus();updateOfflineStatus();const d=getOffline();if(Array.isArray(d.cards)&&d.cards.length)renderFilters(d.cards);if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(console.warn);syncPending()});
+document.addEventListener('DOMContentLoaded',()=>{updateOnlineStatus();updateOfflineStatus();const d=getOffline();if(Array.isArray(d.cards)&&d.cards.length){sessionCards=d.cards;renderFilters(d.cards)}if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(console.warn);syncPending()});
 </script>
 </body>
 </html>
