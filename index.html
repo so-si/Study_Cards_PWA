@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Study Cards">
+  <link rel="manifest" href="./manifest.json">
+  <title>Study Cards</title>
+  <style>
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#111;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif}.app{max-width:900px;margin:0 auto;min-height:100dvh}.top{position:sticky;top:0;background:#111;border-bottom:1px solid #333;padding:14px 16px;z-index:10}.title{font-size:22px;font-weight:800}.panel{padding:18px 16px}.card{background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:16px;margin-bottom:18px}.status{font-size:14px;color:#aaa;line-height:1.6}.btn{width:100%;min-height:52px;border:0;border-radius:12px;font-size:17px;font-weight:800;padding:10px 14px;margin-top:10px}.primary{background:#f5f5f5;color:#111}.secondary{background:#292929;color:#f5f5f5;border:1px solid #555}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #555;border-radius:999px;padding:8px 11px;background:#1a1a1a}.section-label{font-size:15px;font-weight:800;margin:20px 0 10px}.study{display:none}.study.active{display:block}.setup.active{display:block}.setup.hidden{display:none}.meta{font-size:13px;color:#999}.topic{font-size:15px;font-weight:700;color:#ddd;margin-top:6px}.trigger{font-size:24px;line-height:1.5;font-weight:800;color:#666;margin:18px 0}.question{font-size:31px;line-height:1.5;font-weight:800;white-space:pre-wrap}.answer{display:none;margin-top:30px}.answer.visible{display:block}.answer h3{font-size:14px;color:#999;margin:20px 0 8px}.rule{font-size:24px;line-height:1.65;font-weight:700;white-space:pre-wrap}.detail{font-size:18px;line-height:1.65;white-space:pre-wrap;color:#ddd}.controls{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:900px;background:rgba(17,17,17,.97);border-top:1px solid #333;padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:20}.ratings{display:none;grid-template-columns:repeat(3,1fr);gap:8px}.ratings.visible{display:grid}.rating{min-height:52px;border:1px solid #666;border-radius:12px;background:#1a1a1a;color:#fff;font-size:22px;font-weight:800}.spacer{height:150px}.small{font-size:12px;color:#888;margin-top:8px}.danger{color:#ffb4b4}@media(max-width:600px){.question{font-size:29px}.rule{font-size:23px}.trigger{font-size:22px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="title">Study Cards</div></div>
+
+  <section id="setup" class="setup active">
+    <div class="panel">
+      <div class="card">
+        <div id="onlineStatus" class="status"></div>
+        <button class="btn secondary" onclick="loadOnlineCards()">オンラインで最新版を読む</button>
+        <button class="btn primary" onclick="saveOfflineCards()">オフライン用に保存</button>
+        <div id="offlineStatus" class="status" style="margin-top:10px"></div>
+        <div class="small">飛行機に乗る前など、必要なときだけ「オフライン用に保存」を押してください。</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label" style="margin-top:0">科目</div>
+        <div id="subjectFilters" class="chips"></div>
+        <div class="section-label">大分野</div>
+        <div id="majorFilters" class="chips"></div>
+        <button class="btn primary" onclick="startStudy()">学習開始</button>
+        <div id="message" class="status"></div>
+      </div>
+
+      <div class="card">
+        <button class="btn secondary" onclick="setApiToken()">接続キーを設定・変更</button>
+        <div class="small">接続キーはこの端末内だけに保存され、GitHubには保存されません。</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="study" class="study">
+    <div class="panel">
+      <div id="meta" class="meta"></div>
+      <div id="topic" class="topic"></div>
+      <div id="trigger" class="trigger"></div>
+      <div id="question" class="question"></div>
+      <div id="answer" class="answer">
+        <h3 id="ruleHeading">穴あき規範</h3>
+        <div id="rule" class="rule"></div>
+        <h3>理由</h3><div id="reason" class="detail"></div>
+        <h3>判例・具体例</h3><div id="caseName" class="detail"></div>
+        <h3>条文</h3><div id="article" class="detail"></div>
+      </div>
+      <div class="spacer"></div>
+    </div>
+    <div class="controls">
+      <button id="answerButton" class="btn primary" onclick="showAnswer()">答えを見る</button>
+      <div id="ratings" class="ratings">
+        <button class="rating" onclick="rate('○')">○</button>
+        <button class="rating" onclick="rate('△')">△</button>
+        <button class="rating" onclick="rate('×')">×</button>
+      </div>
+      <button class="btn secondary" onclick="backToSetup()">学習条件に戻る</button>
+    </div>
+  </section>
+</div>
+
+<script src="./config.js"></script>
+<script>
+const API_URL=(window.STUDY_CARDS_CONFIG||{}).apiUrl||'';
+const TOKEN_KEY='studyCardsApiTokenV1';
+const OFFLINE_KEY='studyCardsOfflineCardsV1';
+const PENDING_KEY='studyCardsPendingV1';
+let sessionCards=[];
+let activeCards=[];
+let queue=[];
+let index=0;
+let current=null;
+let answerStage=0;
+
+function token(){return localStorage.getItem(TOKEN_KEY)||''}
+function setApiToken(){
+  const v=prompt('接続キーを入力してください。',token());
+  if(v!==null){localStorage.setItem(TOKEN_KEY,v.trim());setMessage('接続キーを保存しました。')}
+}
+
+function apiRequest(action,payload={}){
+  if(!API_URL) return Promise.reject(new Error('GAS URLが設定されていません。'));
+  if(!token()) return Promise.reject(new Error('先に「接続キーを設定・変更」から接続キーを設定してください。'));
+  return new Promise((resolve,reject)=>{
+    const cb='sc_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const timer=setTimeout(()=>finish(new Error('APIがタイムアウトしました。')),20000);
+    function finish(err,val){clearTimeout(timer);delete window[cb];s.remove();err?reject(err):resolve(val)}
+    window[cb]=res=>{if(!res||res.success===false)finish(new Error(res&&res.error||'APIエラー'));else finish(null,res)};
+    const q=new URLSearchParams({action,callback:cb,token:token(),payload:JSON.stringify(payload)});
+    s.onerror=()=>finish(new Error('APIに接続できません。'));
+    s.src=API_URL+'?'+q.toString();
+    document.head.appendChild(s);
+  });
+}
+
+async function loadOnlineCards(){
+  if(!navigator.onLine){setMessage('オフラインです。保存済みカードを利用してください。');return}
+  try{setMessage('最新版を取得中...');const r=await apiRequest('getCards');sessionCards=Array.isArray(r.cards)?r.cards:[];renderFilters(sessionCards);setMessage(sessionCards.length+'問をオンラインで読み込みました。')}catch(e){setMessage('取得失敗: '+e.message,true)}
+}
+
+async function saveOfflineCards(){
+  if(!navigator.onLine){setMessage('オフラインのため保存できません。');return}
+  try{setMessage('オフライン用データを保存中...');const r=await apiRequest('getCards');const cards=Array.isArray(r.cards)?r.cards:[];const data={cards,updatedAt:new Date().toISOString()};localStorage.setItem(OFFLINE_KEY,JSON.stringify(data));sessionCards=cards;renderFilters(cards);updateOfflineStatus();setMessage(cards.length+'問をオフライン用に保存しました。')}catch(e){setMessage('保存失敗: '+e.message,true)}
+}
+
+function getOffline(){try{return JSON.parse(localStorage.getItem(OFFLINE_KEY)||'{}')}catch{return{}}}
+function updateOfflineStatus(){const d=getOffline();const el=document.getElementById('offlineStatus');if(Array.isArray(d.cards)&&d.cards.length){el.textContent='オフライン保存済み: '+d.cards.length+'問 / '+new Date(d.updatedAt).toLocaleString('ja-JP')}else el.textContent='オフライン保存: なし'}
+
+function availableCards(){if(sessionCards.length)return sessionCards;const d=getOffline();return Array.isArray(d.cards)?d.cards:[]}
+function renderFilters(cards){
+  const subs=[...new Set(cards.map(c=>c.subject).filter(Boolean))].sort();
+  const majors=[...new Set(cards.map(c=>c.majorCategory).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ja'));
+  const s=document.getElementById('subjectFilters');const m=document.getElementById('majorFilters');s.innerHTML='';m.innerHTML='';
+  subs.forEach(v=>s.appendChild(chip('subject',v)));majors.forEach(v=>m.appendChild(chip('major',v)));
+}
+function chip(cls,v){const l=document.createElement('label');l.className='chip';const i=document.createElement('input');i.type='checkbox';i.className=cls;i.value=v;const t=document.createElement('span');t.textContent=v;l.append(i,t);return l}
+function checked(cls){return [...document.querySelectorAll('.'+cls+':checked')].map(x=>x.value)}
+
+function startStudy(){
+  const cards=availableCards();
+  if(!cards.length){setMessage('オンラインで読み込むか、オフライン用に保存してください。');return}
+  const subs=checked('subject'),maj=checked('major');
+  activeCards=cards.filter(c=>(!subs.length||subs.includes(c.subject))&&(!maj.length||maj.includes(c.majorCategory)));
+  if(!activeCards.length){setMessage('条件に一致する問題がありません。');return}
+  activeCards.sort(()=>Math.random()-.5);index=0;document.getElementById('setup').classList.add('hidden');document.getElementById('study').classList.add('active');showQuestion();
+}
+
+function showQuestion(){
+  if(index>=activeCards.length){alert('この条件の問題は終了しました。');backToSetup();return}
+  current=activeCards[index];answerStage=0;
+  document.getElementById('meta').textContent=['問'+(current.id||''),current.subject,current.majorCategory,current.category,(index+1)+'/'+activeCards.length].filter(Boolean).join(' / ');
+  document.getElementById('topic').textContent=current.topic||'';
+  document.getElementById('trigger').textContent=current.trigger||'';
+  document.getElementById('question').textContent=current.question||'';
+  document.getElementById('answer').classList.remove('visible');
+  document.getElementById('ratings').classList.remove('visible');
+  document.getElementById('answerButton').style.display='block';document.getElementById('answerButton').textContent='答えを見る';
+  window.scrollTo({top:0,behavior:'auto'});
+}
+function showAnswer(){
+  if(!current)return;
+  const ans=document.getElementById('answer');const btn=document.getElementById('answerButton');
+  if(answerStage===0){document.getElementById('ruleHeading').textContent='穴あき規範';document.getElementById('rule').textContent=current.clozeRule||current.rule||'';fillDetails();ans.classList.add('visible');btn.textContent='全文を見る';answerStage=1;return}
+  document.getElementById('ruleHeading').textContent='規範';document.getElementById('rule').textContent=current.rule||'';btn.style.display='none';document.getElementById('ratings').classList.add('visible');answerStage=2;
+}
+function fillDetails(){document.getElementById('reason').textContent=current.reason||'';document.getElementById('caseName').textContent=current.caseName||'';document.getElementById('article').textContent=current.article||''}
+
+function pending(){try{const x=JSON.parse(localStorage.getItem(PENDING_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return[]}}
+function savePending(x){localStorage.setItem(PENDING_KEY,JSON.stringify(x))}
+function rate(result){
+  const ev={id:current.id,result,eventId:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random()),timestamp:new Date().toISOString()};
+  const p=pending();p.push(ev);savePending(p);syncPending();index++;showQuestion();
+}
+async function syncPending(){
+  if(!navigator.onLine||!token())return;let p=pending();while(p.length){try{await apiRequest('saveResult',p[0]);p.shift();savePending(p)}catch(e){console.warn(e);break}}
+}
+window.addEventListener('online',syncPending);
+
+function backToSetup(){document.getElementById('study').classList.remove('active');document.getElementById('setup').classList.remove('hidden');current=null;syncPending()}
+function setMessage(t,danger=false){const e=document.getElementById('message');e.textContent=t||'';e.className='status'+(danger?' danger':'')}
+function updateOnlineStatus(){document.getElementById('onlineStatus').textContent=navigator.onLine?'現在オンラインです。通常はスプレッドシートから最新版を読みます。':'現在オフラインです。保存済みカードのみ利用できます。'}
+
+window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
+document.addEventListener('DOMContentLoaded',()=>{updateOnlineStatus();updateOfflineStatus();const d=getOffline();if(Array.isArray(d.cards)&&d.cards.length)renderFilters(d.cards);if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(console.warn);syncPending()});
+</script>
+</body>
+</html>
