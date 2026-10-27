@@ -10,7 +10,7 @@
   <link rel="manifest" href="./manifest.json">
   <title>Study Cards</title>
   <style>
-    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#111;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif}.app{max-width:900px;margin:0 auto;min-height:100dvh}.top{position:sticky;top:0;background:#111;border-bottom:1px solid #333;padding:14px 16px;z-index:10}.title{font-size:22px;font-weight:800}.panel{padding:18px 16px}.card{background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:16px;margin-bottom:18px}.status{font-size:14px;color:#aaa;line-height:1.6}.btn{width:100%;min-height:52px;border:0;border-radius:12px;font-size:17px;font-weight:800;padding:10px 14px;margin-top:10px}.primary{background:#f5f5f5;color:#111}.secondary{background:#292929;color:#f5f5f5;border:1px solid #555}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #555;border-radius:999px;padding:8px 11px;background:#1a1a1a}.section-label{font-size:15px;font-weight:800;margin:20px 0 10px}.study{display:none}.study.active{display:block}.setup.active{display:block}.setup.hidden{display:none}.meta{font-size:13px;color:#999}.topic{font-size:15px;font-weight:700;color:#ddd;margin-top:6px}.trigger{font-size:24px;line-height:1.5;font-weight:800;color:#666;margin:18px 0}.question{font-size:31px;line-height:1.5;font-weight:800;white-space:pre-wrap}.answer{display:none;margin-top:30px}.answer.visible{display:block}.answer h3{font-size:14px;color:#999;margin:20px 0 8px}.rule{font-size:24px;line-height:1.65;font-weight:700;white-space:pre-wrap}.detail{font-size:18px;line-height:1.65;white-space:pre-wrap;color:#ddd}.controls{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:900px;background:rgba(17,17,17,.97);border-top:1px solid #333;padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:20}.ratings{display:none;grid-template-columns:repeat(3,1fr);gap:8px}.ratings.visible{display:grid}.rating{min-height:52px;border:1px solid #666;border-radius:12px;background:#1a1a1a;color:#fff;font-size:22px;font-weight:800}.spacer{height:150px}.small{font-size:12px;color:#888;margin-top:8px}.danger{color:#ffb4b4}@media(max-width:600px){.question{font-size:29px}.rule{font-size:23px}.trigger{font-size:22px}}
+    :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#111;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif}.app{max-width:900px;margin:0 auto;min-height:100dvh}.top{position:sticky;top:0;background:#111;border-bottom:1px solid #333;padding:14px 16px;z-index:10}.title{font-size:22px;font-weight:800}.panel{padding:18px 16px}.card{background:#1a1a1a;border:1px solid #333;border-radius:16px;padding:16px;margin-bottom:18px}.status{font-size:14px;color:#aaa;line-height:1.6}.btn{width:100%;min-height:52px;border:0;border-radius:12px;font-size:17px;font-weight:800;padding:10px 14px;margin-top:10px}.primary{background:#f5f5f5;color:#111}.secondary{background:#292929;color:#f5f5f5;border:1px solid #555}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #555;border-radius:999px;padding:8px 11px;background:#1a1a1a}.section-label{font-size:15px;font-weight:800;margin:20px 0 10px}.reader-list{display:none}.reader-list.active{display:block}.reader-article{display:none}.reader-article.active{display:block}.reader-entry{display:block;width:100%;text-align:left;border:1px solid #444;background:#202020;color:#fff;border-radius:12px;padding:15px;margin:9px 0;font-size:17px}.reader-entry small{display:block;color:#aaa;margin-top:5px}.reader-section{margin:24px 0}.reader-section h3{font-size:17px;border-bottom:1px solid #555;padding-bottom:8px}.reader-section p{font-size:17px;line-height:1.9;white-space:pre-wrap}.reader-breadcrumb{color:#aaa;font-size:13px;margin-bottom:12px}.reader-title{font-size:26px;line-height:1.4}.study{display:none}.study.active{display:block}.setup.active{display:block}.setup.hidden{display:none}.meta{font-size:13px;color:#999}.topic{font-size:15px;font-weight:700;color:#ddd;margin-top:6px}.trigger{font-size:24px;line-height:1.5;font-weight:800;color:#666;margin:18px 0}.question{font-size:31px;line-height:1.5;font-weight:800;white-space:pre-wrap}.answer{display:none;margin-top:30px}.answer.visible{display:block}.answer h3{font-size:14px;color:#999;margin:20px 0 8px}.rule{font-size:24px;line-height:1.65;font-weight:700;white-space:pre-wrap}.detail{font-size:18px;line-height:1.65;white-space:pre-wrap;color:#ddd}.controls{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:900px;background:rgba(17,17,17,.97);border-top:1px solid #333;padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:20}.ratings{display:none;grid-template-columns:repeat(3,1fr);gap:8px}.ratings.visible{display:grid}.rating{min-height:52px;border:1px solid #666;border-radius:12px;background:#1a1a1a;color:#fff;font-size:22px;font-weight:800}.spacer{height:150px}.small{font-size:12px;color:#888;margin-top:8px}.danger{color:#ffb4b4}@media(max-width:600px){.question{font-size:29px}.rule{font-size:23px}.trigger{font-size:22px}}
   </style>
 </head>
 <body>
@@ -33,7 +33,7 @@
         <div class="section-label">大分野</div>
         <div id="majorFilters" class="chips"></div>
         <div id="majorHint" class="small">科目を選択すると、その科目の大分野が表示されます。</div>
-        <button class="btn primary" onclick="startStudy()">学習開始</button>
+        <button class="btn primary" onclick="openReaderList()">論点集を読む</button><button class="btn secondary" onclick="startStudy()">従来のクイズで復習</button>
         <div id="message" class="status"></div>
       </div>
 
@@ -44,6 +44,8 @@
     </div>
   </section>
 
+  <section id="readerList" class="reader-list"><div class="panel"><button class="btn secondary" onclick="closeReader()">← 科目選択へ</button><h2>論点一覧</h2><div id="readerListContent"></div></div></section>
+  <section id="readerArticle" class="reader-article"><div class="panel"><button class="btn secondary" onclick="backToReaderList()">← 論点一覧へ</button><div id="readerArticleContent" class="card" style="margin-top:16px"></div><button class="btn secondary" onclick="backToReaderList()">論点一覧へ戻る</button></div></section>
   <section id="study" class="study">
     <div class="panel">
       <div id="meta" class="meta"></div>
@@ -84,6 +86,7 @@ let queue=[];
 let index=0;
 let current=null;
 let answerStage=0;
+let readerTopics=[],readerSelection={};
 
 function token(){return localStorage.getItem(TOKEN_KEY)||''}
 function setApiToken(){
@@ -148,6 +151,58 @@ function renderMajorFilters(){
 function chip(cls,v,onChange){const l=document.createElement('label');l.className='chip';const i=document.createElement('input');i.type='checkbox';i.className=cls;i.value=v;if(onChange)i.addEventListener('change',onChange);const t=document.createElement('span');t.textContent=v;l.append(i,t);return l}
 function checked(cls){return [...document.querySelectorAll('.'+cls+':checked')].map(x=>x.value)}
 
+function readingCards(){
+ const cards=availableCards(),subs=checked('subject'),maj=checked('major');
+ return cards.filter(c=>(!subs.length||subs.includes(c.subject))&&(!maj.length||maj.includes(c.majorCategory)));
+}
+function getReaderTopics(){
+ const groups=new Map();
+ for(const c of readingCards()){
+  const subject=String(c.subject||'未分類'),major=String(c.majorCategory||'その他'),category=String(c.category||'その他');
+  const topic=String(c.topic||c.question||'未分類');
+  const key=JSON.stringify([subject,major,category,topic]);
+  if(!groups.has(key))groups.set(key,{subject,major,category,topic,cards:[]});
+  groups.get(key).cards.push(c);
+ }
+ return [...groups.values()].sort((a,b)=>a.subject.localeCompare(b.subject,'ja')||a.major.localeCompare(b.major,'ja')||a.category.localeCompare(b.category,'ja')||a.topic.localeCompare(b.topic,'ja'));
+}
+function openReaderList(){
+ if(!availableCards().length){setMessage('先にカードデータを読み込んでください。');return}
+ readerTopics=getReaderTopics();document.getElementById('setup').classList.add('hidden');document.getElementById('readerArticle').classList.remove('active');document.getElementById('readerList').classList.add('active');
+ const box=document.getElementById('readerListContent');box.replaceChildren();
+ let prev='';
+ readerTopics.forEach((item,i)=>{
+  const label=[item.subject,item.major,item.category].join(' ＞ ');
+  if(label!==prev){const h=document.createElement('h3');h.className='section-label';h.textContent=label;box.appendChild(h);prev=label}
+  const b=document.createElement('button');b.className='reader-entry';b.textContent=item.topic;
+  const small=document.createElement('small');small.textContent=item.cards.length+'カードを統合';b.appendChild(small);b.onclick=()=>openReaderArticle(i);box.appendChild(b);
+ });
+ window.scrollTo(0,0);
+}
+function addReaderSection(parent,heading,parts){
+ const values=[...new Set(parts.map(v=>String(v||'').trim()).filter(Boolean))];
+ if(!values.length)return;
+ const sec=document.createElement('section');sec.className='reader-section';
+ const h=document.createElement('h3');h.textContent=heading;sec.appendChild(h);
+ values.forEach(v=>{const p=document.createElement('p');p.textContent=v;sec.appendChild(p)});
+ parent.appendChild(sec);
+}
+function openReaderArticle(i){
+ const item=readerTopics[i];if(!item)return;
+ const box=document.getElementById('readerArticleContent');box.replaceChildren();
+ const path=document.createElement('div');path.className='reader-breadcrumb';path.textContent=[item.subject,item.major,item.category].join(' ＞ ');box.appendChild(path);
+ const title=document.createElement('h2');title.className='reader-title';title.textContent=item.topic;box.appendChild(title);
+ addReaderSection(box,'問題場面・トリガー',item.cards.map(c=>c.trigger||c.question));
+ addReaderSection(box,'条文',item.cards.map(c=>c.article));
+ addReaderSection(box,'規範（答案用）',item.cards.map(c=>c.rule));
+ addReaderSection(box,'制度趣旨・理由',item.cards.map(c=>c.reason));
+ addReaderSection(box,'考慮要素（当てはめ観点）',item.cards.map(c=>c.considerations||c.factors));
+ addReaderSection(box,'判例・評価軸',item.cards.map(c=>c.caseName));
+ const notice=document.createElement('p');notice.className='small';notice.textContent='Study Cardsの既存カードを論点別に統合した読み物です。Notion本文の直接同期ではありません。';box.appendChild(notice);
+ document.getElementById('readerList').classList.remove('active');document.getElementById('readerArticle').classList.add('active');window.scrollTo(0,0);
+}
+function backToReaderList(){document.getElementById('readerArticle').classList.remove('active');document.getElementById('readerList').classList.add('active');window.scrollTo(0,0)}
+function closeReader(){document.getElementById('readerList').classList.remove('active');document.getElementById('readerArticle').classList.remove('active');document.getElementById('setup').classList.remove('hidden')}
 function startStudy(){
   const cards=availableCards();
   if(!cards.length){setMessage('オンラインで読み込むか、オフライン用に保存してください。');return}
