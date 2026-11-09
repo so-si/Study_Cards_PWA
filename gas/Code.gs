@@ -17,6 +17,12 @@ function doGet(e) {
     let response;
 
     switch (parameters.action) {
+      case 'getRonshuten':
+        response = getRonshuten_(parameters.token, payload);
+        break;
+      case 'getCardsForReview':
+        response = getCardsForReview_(parameters.token);
+        break;
       case 'getCards':
         response = { success: true, cards: getQuestions({}) };
         break;
@@ -452,4 +458,71 @@ function testCards() {
 
 function testNudgeStatus() {
   Logger.log(JSON.stringify(getNudgeStatus_(), null, 2));
+}
+
+
+// Review export deliberately includes incomplete rows excluded by the quiz API.
+// Fail closed even on installations where legacy read actions allow an empty token.
+function getCardsForReview_(providedToken) {
+  const expected = PropertiesService.getScriptProperties().getProperty('API_TOKEN');
+  if (!expected || normalizeText(providedToken) !== expected) {
+    throw new Error('論点集の全行取得にはAPI_TOKENの設定と認証が必要です。');
+  }
+  const sheet = getCardsSheet();
+  const rowCount = Math.max(0, sheet.getLastRow() - 1);
+  const fields = ['id', 'subject', 'majorCategory', 'category', 'topic', 'trigger',
+    'question', 'clozeRule', 'rule', 'reason', 'caseName', 'article', 'lawUrl'];
+  const rows = rowCount ? sheet.getRange(2, 1, rowCount, 13).getDisplayValues() : [];
+  return {
+    success: true,
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    totalRows: rowCount,
+    completeness: 'all-sheet-rows',
+    cards: rows.map(function(row) {
+      const card = {};
+      fields.forEach(function(field, i) { card[field] = String(row[i] == null ? '' : row[i]); });
+      return card;
+    })
+  };
+}
+
+// Deploy only after uploading the reviewed JSON to a private Drive file and
+// setting RONSHUTEN_FILE_ID in Script Properties. Never put content in public JS.
+function getRonshuten_(providedToken, options) {
+  const props = PropertiesService.getScriptProperties();
+  const expected = props.getProperty('API_TOKEN');
+  if (!expected || normalizeText(providedToken) !== expected) {
+    throw new Error('論点集の取得には認証が必要です。');
+  }
+  const id = props.getProperty('RONSHUTEN_FILE_ID');
+  if (!id) throw new Error('編集済み論点集がまだ登録されていません。');
+  const data = JSON.parse(DriveApp.getFileById(id).getBlob().getDataAsString('UTF-8'));
+  if (data.schemaVersion !== 1 || !Array.isArray(data.topics)) throw new Error('論点集の形式が不正です。');
+  const includeDrafts = options && options.includeDrafts === true;
+  const topics = data.topics.filter(function(topic) {
+    if (!topic || !['draft', 'reviewed', 'verified'].includes(topic.status)) return false;
+    if (topic.status !== 'verified') return includeDrafts;
+    return isVerifiedRonshuten_(topic);
+  });
+  return {success: true, schemaVersion: 1, topics: topics,
+    summary: {reviewAsOf: data.summary && data.summary.reviewAsOf,
+      topicCount: topics.length, lawRevisionId: data.summary && data.summary.lawRevisionId}};
+}
+
+function isVerifiedRonshuten_(topic) {
+  if (!topic.verifiedAt || !Array.isArray(topic.sourceCardIds) || !topic.sourceCardIds.length ||
+      !Array.isArray(topic.reviewNotes) || topic.reviewNotes.length ||
+      !topic.trigger || !topic.purpose || !topic.rule || !Array.isArray(topic.factors)) return false;
+  const fields = ['rule', 'purpose', 'factors', 'cases', 'articles'];
+  if (!fields.every(function(field) {
+    const evidence = topic.reviewEvidence && topic.reviewEvidence[field];
+    return evidence && evidence.reviewedAt && Array.isArray(evidence.sources) && evidence.sources.length &&
+      evidence.sources.every(function(source) { return /^https:\/\//.test(source); });
+  })) return false;
+  return ['cases', 'articles'].every(function(field) {
+    return Array.isArray(topic[field]) && topic[field].every(function(item) {
+      return item && item.verified === true && /^https:\/\//.test(item.source);
+    });
+  });
 }
