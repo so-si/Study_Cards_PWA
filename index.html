@@ -203,11 +203,11 @@ function openReaderArticle(i){
 }
 function backToReaderList(){document.getElementById('readerArticle').classList.remove('active');document.getElementById('readerList').classList.add('active');window.scrollTo(0,0)}
 function closeReader(){document.getElementById('readerList').classList.remove('active');document.getElementById('readerArticle').classList.remove('active');document.getElementById('setup').classList.remove('hidden')}
-function startStudy(){
+function startStudy(sourceIds){
   const cards=availableCards();
   if(!cards.length){setMessage('オンラインで読み込むか、オフライン用に保存してください。');return}
   const subs=checked('subject'),maj=checked('major');
-  activeCards=cards.filter(c=>(!subs.length||subs.includes(c.subject))&&(!maj.length||maj.includes(c.majorCategory)));
+  activeCards=cards.filter(c=>Array.isArray(sourceIds)?sourceIds.includes(String(c.id)):(!subs.length||subs.includes(c.subject))&&(!maj.length||maj.includes(c.majorCategory)));
   if(!activeCards.length){setMessage('条件に一致する問題がありません。');return}
   activeCards.sort(()=>Math.random()-.5);index=0;document.getElementById('setup').classList.add('hidden');document.getElementById('study').classList.add('active');showQuestion();
 }
@@ -250,5 +250,6 @@ function updateOnlineStatus(){document.getElementById('onlineStatus').textConten
 window.addEventListener('online',updateOnlineStatus);window.addEventListener('offline',updateOnlineStatus);
 document.addEventListener('DOMContentLoaded',()=>{updateOnlineStatus();updateOfflineStatus();const d=getOffline();if(Array.isArray(d.cards)&&d.cards.length){sessionCards=d.cards;renderFilters(d.cards)}if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js').catch(console.warn);syncPending()});
 </script>
+<script src="./ronshuten-reader.js"></script>
 </body>
 </html>
